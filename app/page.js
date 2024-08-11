@@ -1,95 +1,94 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+
+import { Box, Stack, TextField } from '@mui/material'
+import { POST } from "./api/chat/route";
+import { useState } from "react";
+
 
 export default function Home() {
+  const [conversation, setConversation] = useState([]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const field = document.getElementById("prompt-field")
+
+    const { value } = field;
+
+    field.value = "";
+    field.ariaDisabled = true;
+
+    const response = await POST([...conversation, {role:"user", content:value}]);
+
+    if(response.ok) {
+      const data = await response.json();
+
+      const { content } = data.choices[0].message;
+      setConversation([...conversation, {role: "user", content: value}, { role: "assistant", content }]);
+    }
+    else {
+      console.error("Failed to fetch response from model");
+    }
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+      <Box
+        component={"main"}
+        height={"100vh"}
+        width={"100vw"}
+        display={"flex"}
+        flexDirection={"column"}
+        justifyContent={"center"}
+        alignItems={"center"}
         >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+        <Box
+          height={{ xs: "100%", sm: "50%" }}
+          width={{ xs: "100%", sm: "50%" }}
+          display={"flex"}
+          flexDirection={"column"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          border={1}
+          borderRadius={'1rem'}
+          sx={{
+            bgcolor: "rgb(50, 50, 255, 0.2)",
+          }}>     
+          <Stack
+            direction={"column"}
+            spacing={2}>
+            <Box
+              overflow={"auto"}>
+              <Stack
+                direction={"column"}
+                height={"500px"}
+                spacing={2}
+                overflow={"auto"}>
+                  { conversation.map((message, index) => { return <Box key={index}><p>{message.content}</p></Box> })}
+              </Stack>
+            </Box>
+            <form label={"prompt"} onSubmit={handleSubmit}>
+              <TextField
+                id="prompt-field"
+                width={"100%"}
+                sx={{
+                  display: "flex",
+                  width: "100%",
+                  bgcolor: "white",
+                  borderRadius: "0.3rem",
+                }}
+                type="contained"
+                defaultValue={"How may I help you?"}
+                // onChange={(e) => setPrompt(e.target.value)}
+                onFocus={(e) => e.target.value = ""}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSubmit(e);
+                }}}>
+              </TextField>
+                <input type="submit" value="Submit"></input>
+            </form>
+          </Stack>
+        </Box>
+      </Box>
   );
 }
+
