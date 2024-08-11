@@ -37,13 +37,13 @@ export default function Home() {
       justifyContent={"center"}
       alignItems={"center"}
       sx={{
-        bgcolor: "#000000", // Dark blue background for the entire page
-        color: "white",      // White text for the entire page
+        bgcolor: "#000000",
+        color: "white",
       }}
     >
       <Typography
         variant="h4"
-        sx={{ marginBottom: "1rem", color: "white" }} // Ensure the title text is white
+        sx={{ marginBottom: "1rem", color: "white" }}
       >
         AI Customer Support
       </Typography>
@@ -58,8 +58,8 @@ export default function Home() {
         border={1}
         borderRadius={'1rem'}
         sx={{
-          bgcolor: "#1E1E3F", // Slightly lighter dark blue for the inner box
-          color: "white",      // White text inside the inner box
+          bgcolor: "#1E1E3F",
+          color: "white",
         }}
       >
         <Stack
@@ -76,8 +76,8 @@ export default function Home() {
             borderRadius={"0.5rem"}
             border={1}
             sx={{
-              bgcolor: "#333366", // Darker background for the conversation area
-              color: "white",      // White text for the conversation
+              bgcolor: "#333366",
+              color: "white",
             }}
           >
             <Stack
@@ -91,7 +91,7 @@ export default function Home() {
                   sx={{
                     wordWrap: "break-word",
                     whiteSpace: "pre-wrap",
-                    color: "white", // Ensure the conversation text is white
+                    color: "white",
                   }}
                 >
                   {message.content}
@@ -104,9 +104,9 @@ export default function Home() {
               id="prompt-field"
               fullWidth
               sx={{
-                bgcolor: "white", // White background for the input field
+                bgcolor: "white",
                 borderRadius: "0.3rem",
-                input: { color: "black" }, // Black text for the input field
+                input: { color: "black" },
               }}
               type="contained"
               defaultValue={"How may I help you?"}
