@@ -1,220 +1,94 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from "react";
-import { firestore } from '@/firebase';
-import { Box, Modal, Stack, TextField, Typography, Button } from "@mui/material";
-import { collection, query, getDocs, deleteDoc, setDoc, doc, getDoc } from 'firebase/firestore';
+import { Box, Stack, TextField } from '@mui/material'
+import { POST } from "./api/chat/route";
+import { useState } from "react";
+
 
 export default function Home() {
-  const [inventory, setInventory] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [itemName, setItemName] = useState("");
-  const [searchQuery, setSearchQuery] = useState(""); // State to manage search query
-  const [recipe, setRecipe] = useState(""); // State to manage recipe
+  const [conversation, setConversation] = useState([]);
 
-  const updateInventory = async () => {
-    const snapshot = query(collection(firestore, 'inventory'));
-    const docs = await getDocs(snapshot);
-    const inventoryList = [];
-    docs.forEach((doc) => {
-      inventoryList.push({
-        name: doc.id,
-        ...doc.data(),
-      });
-    });
-    setInventory(inventoryList);
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const field = document.getElementById("prompt-field")
 
-  const removeItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item)
-    const docSnap = await getDoc(docRef)
+    const { value } = field;
 
-    if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
-      if (quantity === 1) {
-        await deleteDoc(docRef)
-      } else {
-        await setDoc(docRef, { quantity: quantity - 1 })
-      }
+    field.value = "";
+    field.ariaDisabled = true;
+
+    const response = await POST([...conversation, {role:"user", content:value}]);
+
+    if(response.ok) {
+      const data = await response.json();
+
+      const { content } = data.choices[0].message;
+      setConversation([...conversation, {role: "user", content: value}, { role: "assistant", content }]);
+    }
+    else {
+      console.error("Failed to fetch response from model");
     }
   }
-
-  const addItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item)
-    const docSnap = await getDoc(docRef)
-
-    if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
-      await setDoc(docRef, { quantity: quantity + 1 })
-    } else {
-      await setDoc(docRef, { quantity: 1 })
-    }
-  }
-
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
-
-  useEffect(() => {
-    updateInventory();
-  }, []);
-
-  // Filtered inventory based on search query
-  const filteredInventory = inventory.filter(({ name }) =>
-    name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // const generateRecipe = async () => {
-  //   const items = inventory.map(item => item.name);
-  
-  //   try {
-  //     const response = await fetch('/api/getRecipe', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ items }),
-  //     });
-  
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! Status: ${response.status}`);
-  //     }
-  
-  //     const result = await response.json();
-  //     setRecipe(result.recipe || "No recipe found."); // Adjust based on your API response structure
-  //   } catch (error) {
-  //     console.error('Error fetching recipe:', error);
-  //     setRecipe("Error fetching recipe. Please try again.");
-  //   }
-  // };
-  
-  
 
   return (
-    <Box
-      width="100vw"
-      height="100vh"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      gap={2}
-      sx={{ padding: 2, backgroundColor: '#f5f5dc' }} // Light blue background
-    >
-      {/* Title */}
-      <Typography variant="h1" color="#333" mb={2}>
-        Inventory Management System
-      </Typography>
-
-      {/* Top Container for Buttons */}
-      <Box width="100%" maxWidth="800px" display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Button variant="contained" onClick={handleOpen}>
-          Add New Item
-        </Button>
-      </Box>
-
-      {/* Search Bar */}
-      <TextField
-        variant="outlined"
-        placeholder="Search items..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        sx={{ width: "100%", maxWidth: "800px", marginBottom: 2 }}
-      />
-
-      {/* Inventory List */}
-      <Box border="1px solid #333" width="100%" maxWidth="800px">
-        <Box height="100px" bgcolor="#ADD8E6" display="flex" alignItems="center" justifyContent="center">
-          <Typography variant="h2" color="#333">
-            Inventory Items
-          </Typography>
-        </Box>
-
-        <Stack width="100%" height="500px" spacing={2} overflow="auto">
-          {
-            filteredInventory.map(({ name, quantity }) => (
-              <Box
-                key={name}
-                width="100%"
-                minHeight="150px"
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-                bgcolor="#f0f0f0"
-                padding={5}
-              >
-                <Typography variant="h3" color="#333" textAlign="center">
-                  {name.charAt(0).toUpperCase() + name.slice(1)}
-                </Typography>
-                <Typography variant="h3" color="#333" textAlign="center">
-                  {quantity}
-                </Typography>
-                <Stack direction="row" spacing={2}>
-                  <Button variant="contained" onClick={() =>
-                    addItem(name)
-                  }>
-                    Add
-                  </Button>
-                  <Button variant="contained" onClick={() =>
-                    removeItem(name)
-                  }>
-                    Remove
-                  </Button>
-                </Stack>
-              </Box>
-            ))}
-        </Stack>
-      </Box>
-
-      {/* Display Recipe */}
-      {recipe && (
-        <Box mt={4} width="100%" maxWidth="800px">
-          <Typography variant="h6" mb={2}>
-            Suggested Recipe:
-          </Typography>
-          <Typography>{recipe}</Typography>
-        </Box>
-      )}
-
-      {/* Add Item Modal */}
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          position="absolute"
-          top="50%"
-          left="50%"
-          width={400}
-          bgcolor="white"
-          border="2px solid #000"
-          boxShadow={24}
-          p={4}
-          display="flex"
-          flexDirection="column"
-          gap={3}
-          sx={{
-            transform: 'translate(-50%, -50%)'
-          }}
+      <Box
+        component={"main"}
+        height={"100vh"}
+        width={"100vw"}
+        display={"flex"}
+        flexDirection={"column"}
+        justifyContent={"center"}
+        alignItems={"center"}
         >
-          <Typography variant="h6"> Add Item </Typography>
-          <Stack width="100%" direction="row" spacing={2}></Stack>
-          <Box display="flex" alignItems="center" mt={2}>
-            <TextField
-              variant='outlined'
-              fullWidth
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-            />
-            <Button
-              variant='outlined'
-              onClick={() => {
-                addItem(itemName);
-                setItemName('');
-                handleClose();
-              }}
-              sx={{ marginLeft: 2 }}
-            >
-              Add
-            </Button>
-          </Box>
+        <Box
+          height={{ xs: "100%", sm: "50%" }}
+          width={{ xs: "100%", sm: "50%" }}
+          display={"flex"}
+          flexDirection={"column"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          border={1}
+          borderRadius={'1rem'}
+          sx={{
+            bgcolor: "rgb(50, 50, 255, 0.2)",
+          }}>     
+          <Stack
+            direction={"column"}
+            spacing={2}>
+            <Box
+              overflow={"auto"}>
+              <Stack
+                direction={"column"}
+                height={"500px"}
+                spacing={2}
+                overflow={"auto"}>
+                  { conversation.map((message, index) => { return <Box key={index}><p>{message.content}</p></Box> })}
+              </Stack>
+            </Box>
+            <form label={"prompt"} onSubmit={handleSubmit}>
+              <TextField
+                id="prompt-field"
+                width={"100%"}
+                sx={{
+                  display: "flex",
+                  width: "100%",
+                  bgcolor: "white",
+                  borderRadius: "0.3rem",
+                }}
+                type="contained"
+                defaultValue={"How may I help you?"}
+                // onChange={(e) => setPrompt(e.target.value)}
+                onFocus={(e) => e.target.value = ""}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSubmit(e);
+                }}}>
+              </TextField>
+                <input type="submit" value="Submit"></input>
+            </form>
+          </Stack>
         </Box>
-      </Modal>
-    </Box>
+      </Box>
   );
 }
+
