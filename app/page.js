@@ -36,10 +36,21 @@ export default function Home() {
       flexDirection={"column"}
       justifyContent={"center"}
       alignItems={"center"}
+      sx={{
+        bgcolor: "#000000", // Dark blue background for the entire page
+        color: "white",      // White text for the entire page
+      }}
     >
+      <Typography
+        variant="h4"
+        sx={{ marginBottom: "1rem", color: "white" }} // Ensure the title text is white
+      >
+        AI Customer Support
+      </Typography>
+
       <Box
-        height={{ xs: "100%", sm: "50%" }}
-        width={{ xs: "100%", sm: "50%" }}
+        height={{ xs: "100%", sm: "70%" }}
+        width={{ xs: "100%", sm: "70%" }}
         display={"flex"}
         flexDirection={"column"}
         justifyContent={"center"}
@@ -47,7 +58,8 @@ export default function Home() {
         border={1}
         borderRadius={'1rem'}
         sx={{
-          bgcolor: "rgb(50, 50, 255, 0.2)",
+          bgcolor: "#1E1E3F", // Slightly lighter dark blue for the inner box
+          color: "white",      // White text inside the inner box
         }}
       >
         <Stack
@@ -58,12 +70,15 @@ export default function Home() {
         >
           <Box
             overflow={"auto"}
-            height={"400px"}
+            height={"500px"}
             width={"100%"}
             padding={2}
             borderRadius={"0.5rem"}
             border={1}
-            sx={{ bgcolor: "white" }}
+            sx={{
+              bgcolor: "#333366", // Darker background for the conversation area
+              color: "white",      // White text for the conversation
+            }}
           >
             <Stack
               direction={"column"}
@@ -76,6 +91,7 @@ export default function Home() {
                   sx={{
                     wordWrap: "break-word",
                     whiteSpace: "pre-wrap",
+                    color: "white", // Ensure the conversation text is white
                   }}
                 >
                   {message.content}
@@ -88,8 +104,9 @@ export default function Home() {
               id="prompt-field"
               fullWidth
               sx={{
-                bgcolor: "white",
+                bgcolor: "white", // White background for the input field
                 borderRadius: "0.3rem",
+                input: { color: "black" }, // Black text for the input field
               }}
               type="contained"
               defaultValue={"How may I help you?"}
