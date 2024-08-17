@@ -73,6 +73,74 @@
   }
 } */
 
+/* @font-face {
+  font-family: 'Font Awesome 6 Solid';
+  src: url('/fonts/fa-solid-900.woff2') format('woff2');
+} */
+
+/* 
+div#image-upload-modal.active {
+  top: 50px;
+}
+
+.MuiModal-root {
+  top: -20px;
+  display: flex;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+
+
+:root {
+  --primary-red-value: 1;
+  --primary-green-value: 65;
+  --primary-blue-value: 255;
+  --primary-rgb: 1, 65, 255;
+  --button-hover-offset: 45;
+  --text-primary-rgb: 0, 0, 0;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+:root textarea:focus {
+  outline: none !important;
+  border: none !important;
+  /* box-shadow: inset 1px 1px 1em 1px rgb(var(--primary-red-value), var(--primary-green-value), var(--primary-blue-value)); */
+}
+
+
+
+
+:root button  {
+  appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+i {
+  color: rgb(var(--primary-red-value), var(--primary-green-value), var(--primary-blue-value));
+}
+
+:root button:hover i {
+  color: rgb(calc(var(--primary-red-value) + var(--button-hover-offset)), calc(var(--primary-green-value) + var(--button-hover-offset)), calc(var(--primary-blue-value) + var(--button-hover-offset)));
+}
+
+
+main ::-webkit-scrollbar {
+  background: transparent;
+}
+
+main ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -87,12 +155,12 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
+  /* background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
-    rgb(var(--background-start-rgb));
+    rgb(var(--background-start-rgb)); */
 }
 
 a {
