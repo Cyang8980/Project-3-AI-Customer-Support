@@ -9,7 +9,7 @@ export default function ChatBubble({ message, index }) {
             options.alignSelf = "flex-end";
             options.bgcolor = "rgb(var(--primary-rgb))";
             options.flexDirection = "row";
-            options.right= "-21.1px";
+            options.right= "-23px";
             options.svg = { fill: "rgb(var(--primary-rgb))" };
           break;
         case "assistant":
@@ -31,9 +31,7 @@ export default function ChatBubble({ message, index }) {
             <Box 
                 display={"flex"}
                 flexDirection={options.flexDirection}
-                alignItems={"flex-end"}
-                marginRight={"0.5rem"}
-                marginLeft={"0.5rem"}>
+                alignItems={"flex-end"}>
                 <Box 
                     position={"relative"}
                     key={index}
@@ -61,7 +59,7 @@ export default function ChatBubble({ message, index }) {
                     {message.content}
                     </Typography>
                 </Box>
-                <svg style={options.svg.style} xmlns="http://www.w3.org/2000/svg" height="25px" viewBox="0 0 87.621 64.619" fill="none">
+                <svg xmlns="http://www.w3.org/2000/svg" height="25px" viewBox="0 0 83 60" fill="none">
                     <path d="M 55.316 0.008 C 55.472 39.971 58.234 55.576 87.621 64.619 L 0.00 64.619 L 55.316 0.00 Z" fill={options.svg.fill} transform={options.svg.transform}></path>
                 </svg>
             </Box>
