@@ -23,28 +23,37 @@ export default function Chat() {
     const [imageModalOpen, setImageModalOpen] = useState(false);
     const [image, setImage] = useState(null);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const field = document.getElementById("prompt-field");
-    
-        const { value } = field;
 
-        const userStamp = new Date().toLocaleTimeString();
-    
-        field.value = "";
-        field.ariaDisabled = true;
-    
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const field = document.getElementById("prompt-field");
+  
+      const { value } = field;
+
+      setConversation(convo => [...convo, { role: "user", content: value, timestamp: new Date().toLocaleTimeString()}]);
+  
+      field.value = "";
+      field.ariaDisabled = true;
+      if (window.Worker) {
+        const worker = new Worker(new URL("../api/chat/worker.js", import.meta.url));
+        worker.postMessage({ messages: [...conversation, { role: "user", content: value }] });
+        worker.onmessage = (e) => {
+            const { data } = e;
+            const { content } = data.choices[0].message;
+            setConversation(convo => [...convo, { role: "assistant", content, timestamp: new Date().toLocaleTimeString()}]);
+        }
+      } else {
         const response = await POST({ messages: [...conversation, { role: "user", content: value }]});
-        const botStamp = new Date().toLocaleTimeString();
 
         if (response.ok) {
           const data = await response.json();
           const { content } = data.choices[0].message;
-          setConversation([...conversation, { role: "user", content: value, timestamp: userStamp }, { role: "assistant", content, timestamp: botStamp }]);
+          setConversation(convo => [...convo, { role: "assistant", content, timestamp: new Date().toLocaleTimeString()}]);
           document.activeElement.blur();
         } else {
           console.error("Failed to fetch response from model");
         }
+      }
     };
 
     // const handleImageUpload = (e) => {

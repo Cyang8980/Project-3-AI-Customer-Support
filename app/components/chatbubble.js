@@ -37,6 +37,8 @@ export default function ChatBubble({ message, index }) {
                     key={index}
                     bgcolor={options.bgcolor}
                     borderRadius={"0.5rem"}
+                    minWidth={'32px'}
+                    minHeight={'32px'}
                     left={options.left}
                     right={options.right}
                     width={"fit-content"}
